@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DAA Search Game</title>
+
+  <style>
+
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:linear-gradient(to right,#141e30,#243b55);
+      color:white;
+      text-align:center;
+    }
+
+    .page{
+      display:none;
+      padding:40px;
+    }
+
+    .active{
+      display:block;
+    }
+
+    h1{
+      font-size:45px;
+      margin-bottom:20px;
+    }
+
+    p{
+      font-size:20px;
+    }
+
+    button{
+      padding:12px 25px;
+      margin:10px;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:18px;
+      font-weight:bold;
+      background:orange;
+      color:white;
+      transition:0.3s;
+    }
+
+    button:hover{
+      transform:scale(1.05);
+    }
+
+    input{
+      padding:12px;
+      width:320px;
+      border:none;
+      border-radius:8px;
+      font-size:16px;
+      margin-top:15px;
+    }
+
+    .array-box{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:30px;
+    }
+
+    .box{
+      width:60px;
+      height:60px;
+      background:steelblue;
+      border-radius:10px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      font-size:22px;
+      font-weight:bold;
+      transition:0.4s;
+    }
+
+    .highlight{
+      background:red !important;
+      transform:scale(1.1);
+    }
+
+    .found{
+      background:green !important;
+    }
+
+    #result{
+      margin-top:25px;
+      font-size:24px;
+      font-weight:bold;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<!-- HOME PAGE -->
+
+<div id="home" class="page active">
+
+  <h1>🎮 DAA Search Game</h1>
+
+  <p>
+    Learn Linear Search and Binary Search in a Fun Way!
+  </p>
+
+  <h2>Select Level</h2>
+
+  <button onclick="setLevel('easy')">Easy</button>
+  <button onclick="setLevel('medium')">Medium</button>
+  <button onclick="setLevel('hard')">Hard</button>
+
+  <br><br>
+
+  <button onclick="goToInputPage()">
+    Start Game
+  </button>
+
+</div>
+
+<!-- INPUT PAGE -->
+
+<div id="inputPage" class="page">
+
+  <h1>Enter Array Elements</h1>
+
+  <p>
+    Enter numbers separated by commas
+  </p>
+
+  <input
+    type="text"
+    id="elements"
+    placeholder="Example: 5,2,9,1,7"
+  >
+
+  <br>
+
+  <button onclick="saveArray()">
+    Next
+  </button>
+
+  <button onclick="goHome()">
+    Back
+  </button>
+
+</div>
+
+<!-- SEARCH PAGE -->
+
+<div id="searchPage" class="page">
+
+  <h1>Search Element</h1>
+
+  <div class="array-box" id="arrayContainer"></div>
+
+  <input
+    type="number"
+    id="searchElement"
+    placeholder="Enter element to search"
+  >
+
+  <br>
+
+  <button onclick="linearSearch()">
+    Linear Search
+  </button>
+
+  <button onclick="binarySearch()">
+    Binary Search
+  </button>
+
+  <br>
+
+  <button onclick="pauseSearch()">
+    Pause
+  </button>
+
+  <button onclick="resumeSearch()">
+    Resume
+  </button>
+
+  <button onclick="restartGame()">
+    Restart
+  </button>
+
+  <button onclick="goBack()">
+    Back
+  </button>
+
+  <div id="result"></div>
+
+</div>
+
+<script>
+
+  let arr = [];
+
+  let isPaused = false;
+
+  let level = "easy";
+
+  // PAGE NAVIGATION
+
+  function showPage(pageId){
+
+    document.querySelectorAll('.page').forEach(page=>{
+      page.classList.remove('active');
+    });
+
+    document.getElementById(pageId).classList.add('active');
+  }
+
+  function goToInputPage(){
+    showPage('inputPage');
+  }
+
+  function goHome(){
+    showPage('home');
+  }
+
+  function goBack(){
+    showPage('inputPage');
+  }
+
+  // LEVEL
+
+  function setLevel(selectedLevel){
+
+    level = selectedLevel;
+
+    alert("Level Selected : " + level);
+  }
+
+  // SAVE ARRAY
+
+  function saveArray(){
+
+    const input =
+      document.getElementById('elements').value;
+
+    if(!input){
+
+      alert("Please enter array elements");
+      return;
+    }
+
+    arr = input
+          .split(',')
+          .map(num => parseInt(num.trim()));
+
+    displayArray(arr);
+
+    showPage('searchPage');
+  }
+
+  // DISPLAY ARRAY
+
+  function displayArray(array){
+
+    const container =
+      document.getElementById('arrayContainer');
+
+    container.innerHTML = '';
+
+    array.forEach(value=>{
+
+      const box = document.createElement('div');
+
+      box.classList.add('box');
+
+      box.innerText = value;
+
+      container.appendChild(box);
+    });
+  }
+
+  // LINEAR SEARCH
+
+  async function linearSearch(){
+
+    resetBoxes();
+
+    const target =
+      parseInt(document.getElementById('searchElement').value);
+
+    const boxes =
+      document.querySelectorAll('.box');
+
+    for(let i=0;i<arr.length;i++){
+
+      boxes[i].classList.add('highlight');
+
+      if(level === 'easy')
+        await sleep(1200);
+
+      else if(level === 'medium')
+        await sleep(700);
+
+      else
+        await sleep(300);
+
+      if(arr[i] === target){
+
+        boxes[i].classList.remove('highlight');
+
+        boxes[i].classList.add('found');
+
+        document.getElementById('result').innerHTML =
+          `✅ Element ${target} found at index ${i} using Linear Search`;
+
+        return;
+      }
+
+      boxes[i].classList.remove('highlight');
+    }
+
+    document.getElementById('result').innerHTML =
+      `❌ Element ${target} not found`;
+  }
+
+  // BINARY SEARCH
+
+  async function binarySearch(){
+
+    resetBoxes();
+
+    const target =
+      parseInt(document.getElementById('searchElement').value);
+
+    arr.sort((a,b)=>a-b);
+
+    displayArray(arr);
+
+    const boxes =
+      document.querySelectorAll('.box');
+
+    let left = 0;
+    let right = arr.length - 1;
+
+    while(left <= right){
+
+      let mid =
+        Math.floor((left + right)/2);
+
+      boxes[mid].classList.add('highlight');
+
+      if(level === 'easy')
+        await sleep(1500);
+
+      else if(level === 'medium')
+        await sleep(800);
+
+      else
+        await sleep(400);
+
+      if(arr[mid] === target){
+
+        boxes[mid].classList.remove('highlight');
+
+        boxes[mid].classList.add('found');
+
+        document.getElementById('result').innerHTML =
+          `✅ Element ${target} found at index ${mid} using Binary Search`;
+
+        return;
+      }
+
+      else if(arr[mid] < target){
+
+        boxes[mid].classList.remove('highlight');
+
+        left = mid + 1;
+      }
+
+      else{
+
+        boxes[mid].classList.remove('highlight');
+
+        right = mid - 1;
+      }
+    }
+
+    document.getElementById('result').innerHTML =
+      `❌ Element ${target} not found`;
+  }
+
+  // RESET
+
+  function resetBoxes(){
+
+    document.querySelectorAll('.box').forEach(box=>{
+
+      box.classList.remove('highlight');
+
+      box.classList.remove('found');
+    });
+  }
+
+  // PAUSE
+
+  function pauseSearch(){
+    isPaused = true;
+  }
+
+  // RESUME
+
+  function resumeSearch(){
+    isPaused = false;
+  }
+
+  // RESTART
+
+  function restartGame(){
+    location.reload();
+  }
+
+  // SLEEP
+
+  async function sleep(ms){
+
+    while(isPaused){
+
+      await new Promise(resolve =>
+        setTimeout(resolve,100)
+      );
+    }
+
+    return new Promise(resolve =>
+      setTimeout(resolve,ms)
+    );
+  }
+
+</script>
+
+</body>
+</html>
